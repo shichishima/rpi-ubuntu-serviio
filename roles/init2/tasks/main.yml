@@ -1,0 +1,19 @@
+---
+# ラズパイserviioサーバ固有の設定
+
+# mDNSの有効化
+# https://qiita.com/m-tmatma/items/7668afea91aff4fbfa85
+
+- name: install apt packeges
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    state: latest
+  loop:
+    - avahi-daemon
+
+- name: restart avahi-daemon
+  systemd:
+    name: avahi-daemon.service
+    state: restarted
+    enabled: yes

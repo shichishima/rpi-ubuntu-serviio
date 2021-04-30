@@ -1,0 +1,59 @@
+---
+# Serviioのインストールと起動設定
+
+- name: install apt packeges
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    state: latest
+  loop:
+    - openjdk-17-jre
+    - ffmpeg
+
+# serviioアカウント作成
+- name: create serviio group
+  group:
+    name: serviio
+    state: present
+- name: create serviio user
+  user:
+    name: serviio
+    groups: serviio
+    state: present
+
+# 公式サイトからtgzをダウンロードして展開
+- name: Download and unzip Serviio {{ serviio_version }} files
+  unarchive:
+    src: "https://download.serviio.org/releases/serviio-{{ serviio_version }}-linux.tar.gz"
+    dest: "/usr/local/bin" # binに直接展開する。(/usr/local/srcではなく)
+    copy: no
+- name: chown -R /usr/local/bin/serviio
+  file:
+    owner: serviio
+    group: serviio
+    recurse: yes
+    path: "/usr/local/bin/serviio-{{ serviio_version }}"
+
+- name: change FriendlyName
+  replace:
+    dest: "/usr/local/bin/serviio-{{ serviio_version }}/config/profiles.xml"
+    # <FriendlyName>(.*)Serviio ({computerName})</FriendlyName>
+    regexp: "<FriendlyName>(.*)</FriendlyName>"
+    replace: "<FriendlyName>{{ dlna_friendly_name }}</FriendlyName>"
+
+# systemdのserviceファイルを作って
+- name: copy serviio.service file
+  template:
+    src: "serviio.service"
+    dest: "/etc/systemd/system"
+    backup: no
+    owner: root
+    group: root
+
+# 起動する
+- name: restart serviio
+  systemd:
+    name: serviio.service
+    daemon_reload: yes
+    state: restarted
+    enabled: yes

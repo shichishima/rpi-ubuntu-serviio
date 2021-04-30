@@ -1,0 +1,23 @@
+---
+# Mac側で実行しておくこと：
+# raspi-imagerでubuntu serverのイメージを焼く
+# キーボード不要、Ethernetだけ有線で刺して起動
+# DHCPで付与されるIPアドレスを調べる
+# hosts.ymlファイルにIPアドレスを記載する
+# 自分のアカウントの公開鍵をコピーする
+#   ssh-add ~/.ssh/id_rsa
+#   ssh ubuntu@(IPアドレス)  で初回のパスワード変更
+#   ssh-copy-id ubuntu@(IPアドレス)
+
+- hosts: serviio
+  become: yes
+  roles:
+    - { name: init, tags: init }
+    - { name: init2, tags: init2 }
+    - { name: serviio, tags: serviio }
+    - { name: nginx, tags: nginx } # ポート80を23423にproxy
+
+#  tasks:
+#    - name: Set Timezone to JST
+#      timezone: name=Asia/Tokyo
+      

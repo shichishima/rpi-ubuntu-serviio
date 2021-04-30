@@ -1,0 +1,18 @@
+# Systemd unit file for serviio
+# https://forum.serviio.org/viewtopic.php?f=5&t=4836
+# インストール場所を調整
+# バージョンはhosts.ymlで定義
+
+[Unit]
+Description=Serviio DLNA/uPNP server
+After=syslog.target network.target
+
+[Service]
+User=serviio
+Group=serviio
+Type=forking
+ExecStart=sh -c "/usr/local/bin/serviio-{{ serviio_version }}/bin/serviio.sh &"
+ExecStop=sh -c "/usr/local/bin/serviio-{{ serviio_version }}/bin/serviio.sh -stop &"
+
+[Install]
+WantedBy=multi-user.target

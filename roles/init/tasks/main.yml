@@ -1,0 +1,99 @@
+---
+- name: change /etc/cloud/cloud.cfg
+  lineinfile:
+    dest: /etc/cloud/cloud.cfg
+    state: present
+    regexp: "^preserve_hostname: false"
+    line: "preserve_hostname: true"
+- name: set hostname
+  shell: "/usr/bin/hostnamectl set-hostname {{ inventory_hostname }}"
+
+- name: set hostname to /etc/hosts file
+  lineinfile:
+    dest: /etc/hosts
+    state: present
+    insertafter: "^127.0.0.1\t"
+    line: "127.0.1.1\t{{ inventory_hostname }}"
+
+- name: Set Timezone to JST
+  timezone: name=Asia/Tokyo
+
+- name: restart crond to enable timezone
+  systemd: name=cron.service state=restarted enabled=yes
+
+- name: add japanese NTP servers
+  lineinfile:
+    dest: /etc/systemd/timesyncd.conf
+    state: present
+    insertafter: "^\\[Time\\]"
+    line: "NTP={{ ntp_address }}"
+  when: ntp_address is defined
+
+- name: restart NTP sync (systemd-timesyncd)
+  systemd: name=systemd-timesyncd.service state=restarted enabled=yes
+
+- name: install apt packeges
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    state: latest
+  loop:
+    - aptitude
+    - language-pack-ja
+    - apt-transport-https
+    - curl
+    - unzip
+    - dnsutils
+    - jq
+    - bash-completion
+    - vim
+
+- name: create locale to ja_JP.UTF-8
+  locale_gen: name=ja_JP.UTF-8 state=present
+
+- name: change locale to ja_JP.UTF-8
+  command: update-locale LANG=ja_JP.UTF-8
+
+- name: apt-get upgrade
+  apt:
+    upgrade: full
+    update_cache: yes
+    cache_valid_time: 3600
+
+# /etc/ssh/sshd_config 設定
+#   参考： https://open-groove.net/linux/sshd_config-option/
+#   UsePAM no ：公開鍵認証を有効化
+#   PasswordAuthentication no：パスワード認証を禁止
+#   ChallengeResponseAuthentication no：公開鍵認証だけにする
+- name: change /etc/ssh/sshd_config
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    state: present
+    backrefs: yes
+    regexp: "{{ item.regexp}}"
+    line: "{{ item.line }}"
+  loop:
+    - { regexp: '^#?(UsePAM)', line: '\1 no' }
+    - { regexp: '^#?(PasswordAuthentication)', line: '\1 no' }
+    - { regexp: '^#?(ChallengeResponseAuthentication)', line: '\1 no' }
+- name: restart sshd
+  systemd: name=sshd.service state=restarted enabled=yes
+
+# 共通の環境変数定義
+- name: create /etc/profile.d
+  file:
+    path: /etc/profile.d
+    state: directory
+- name: add export LESSCHARSET
+  copy:
+    dest: /etc/profile.d/lesscharset.sh
+    content: |
+      export LESSCHARSET=UTF-8
+- name: add vimrc.local
+  copy:
+    dest: /etc/vim/vimrc.local
+    content: |
+      set encoding=utf-8
+      set fileencodings=ucs-bom,iso-2022-jp,euc-jp,cp932
+      set fileformats=unix,dos,mac
+      set ambiwidth=double

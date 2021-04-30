@@ -1,0 +1,29 @@
+---
+# NGINXのインストールと設定
+#
+# http://serviio.local/ でアクセス可能とする。
+# http://serviio.local/console にリダイレクトする
+# 内部的には http://serviio.local:23423/ にproxyする
+
+- name: install Nginx
+  apt:
+    name: nginx
+    state: latest
+
+- name: delete sites-enabled/default file
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: copy Nginx conf files
+  copy:
+    src: 80.conf
+    dest: /etc/nginx/conf.d/80.conf
+    mode: 0644
+
+# NGINX起動
+- name: start Nginx service
+  systemd:
+    name: nginx.service
+    state: restarted
+    enabled: yes
