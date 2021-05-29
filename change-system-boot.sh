@@ -1,4 +1,10 @@
 #!/bin/bash
+#----------------------------------------------------------------
+# RaspberryPi初回起動時のためにcloud-initとconfig.txtを調整する。
+# SSIDを設定しなければWi-Fiは設定されない。(有線LANでのみ接続可能)
+# SSIDとパスワードを設定した場合には無線LAN設定が書き込まれる。
+# この場合には初回起動時に一度自動できに再起動が実行される。
+#----------------------------------------------------------------
 
 system_boot_path=/Volumes/system-boot
 /bin/echo -n "path to system-boot [${system_boot_path}]: "
@@ -15,16 +21,15 @@ if [ ! -z ${str} ]; then
 fi
 
 wifi_ssid=
+wifi_passwd=
+wifi_str="(Wired LAN only)"
 /bin/echo -n "wifi_ssid [${wifi_ssid}]: "
 read str
 if [ ! -z ${str} ]; then
     wifi_ssid=${str}
-fi
-
-wifi_passwd=
-/bin/echo -n "wifi_passwd [${wifi_passwd}]: "
-read str
-if [ ! -z ${str} ]; then
+    wifi_str=${str}
+    /bin/echo -n "wifi_passwd [${wifi_passwd}]: "
+    read str
     wifi_passwd=${str}
 fi
 
@@ -35,11 +40,11 @@ cat <<EOF
 
 system_boot_path: ${system_boot_path}
        hdmi_mode: ${hdmi_mode}
-       wifi_ssid: ${wifi_ssid}
+       wifi_ssid: ${wifi_str}
     wifi_passwod: ${wifi_passwd}
 
 EOF
-/bin/echo -n "OK? "
+/bin/echo -n "OK? (Y/y) "
 read str
 if [  "${str}" != "Y" ] && [ "${str}" != "y" ]; then
     echo exit.
