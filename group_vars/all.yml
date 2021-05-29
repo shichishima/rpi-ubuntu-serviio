@@ -1,0 +1,5 @@
+---
+ansible_user: ubuntu
+
+# NTPサーバアドレス
+ntp_address: "ntp.jst.mfeed.ad.jp ntp.nict.jp"
