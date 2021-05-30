@@ -14,6 +14,7 @@
   roles:
     - { name: init, tags: init }
     - { name: init2, tags: init2 }
+#    - { name: argonone, tags: argonone }
     - { name: serviio, tags: serviio }
     - { name: nginx, tags: nginx } # ポート80を23423にproxy
 

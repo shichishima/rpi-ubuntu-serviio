@@ -28,7 +28,7 @@ Raspberry-Pi-Imagerで焼き込んだUbuntu Server 21.04 (64bit) に対し、clo
 
 ## Step2: ネットワーク越しのサーバ構築
 6. Raspberry Piの起動完了までしばらく待つ
-	- Wi-Fi設定時は自動的に一度再起動するので
+	- Wi-Fi設定時は自動的に一度再起動するので3分くらい待つ
 7. Raspberry PiのIPアドレスを調べる
 8. `hosts.yml` ファイルにIPアドレスを記載する
 9. macOSからRaspberry Piにssh接続するための設定
@@ -37,6 +37,7 @@ Raspberry-Pi-Imagerで焼き込んだUbuntu Server 21.04 (64bit) に対し、clo
 		- `ssh ubuntu@(IPアドレス)`
 		- デフォルトパスワードは `ubuntu`
 	- 自分のアカウントの公開鍵をコピーする：`ssh-copy-id ubuntu@(IPアドレス)`
+	- 鍵によるsshログイン確認：`ssh ubuntu@(IPアドレス)`
 10. サーバ構築実行
 	- `ansible-playbook -i hosts.yml site.yml`
 
@@ -45,3 +46,9 @@ Raspberry-Pi-Imagerで焼き込んだUbuntu Server 21.04 (64bit) に対し、clo
 avahiを導入し、Nginxでポート`:80`からServiioのデフォルトポート`:23423`へのproxyおよびトップ画面のパス`/console`へのリダイレクトを構成しているので、次のURLでServiioトップ画面にアクセスできる
 
 http://serviio.local/
+
+# おまけ
+Raspberry Pi 4用ケース「Argon ONE」を利用している場合はのファンコントロールスクリプトのインストールのため`site.yml`の以下の行を有効にする。
+```
+    - { name: argonone, tags: argonone }
+```

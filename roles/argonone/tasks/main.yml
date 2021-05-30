@@ -1,0 +1,27 @@
+---
+# Raspberry Pi 4 用のケース「Argon ONE」のための設定
+# https://www.amazon.co.jp/dp/B08M9F5VNH
+#
+# ケース付属の電源ボタンとファンコントロール機能を有効化する
+
+- name: install ARGON ONE config-tools.
+  shell: curl https://download.argon40.com/argon1.sh | bash
+
+# 電源OFF時の操作
+# - 短押し：電源ON
+#
+# 電源ON時の操作
+# - 長押し(〜3秒)：ソフトshutdownののち電源断
+# - 短押し：(動作なし)
+# - ダブルタップ：リブート
+# - 長押し(5秒〜)：強制shutdown
+
+# このスクリプト実行により、次の3つのコマンドが利用可能になる。
+# argonone-config     ファンコントロール設定
+#                     (デフォルト＝55C 10%、60C 55%、65C 100%)
+# argonone-ir         IRレシーバー設定
+# argonone-uninstall  アンインストール
+
+# Raspberry Pi でのCPU温度の調べ方：
+# cat /sys/class/thermal/thermal_zone0/temp
+
