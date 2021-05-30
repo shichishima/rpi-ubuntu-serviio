@@ -12,6 +12,12 @@ read str
 if [ ! -z ${str} ]; then
     system_boot_path=${str}
 fi
+if [ ! -d ${system_boot_path} ]; then
+    echo ------------------------------------------------------------
+    echo The directory does not exist. Did you forget to RE-MOUNT it?
+    echo ------------------------------------------------------------
+    exit;
+fi
 
 hdmi_mode=4
 /bin/echo -n "hdmi_mode [${hdmi_mode}]: "
