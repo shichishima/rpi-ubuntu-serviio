@@ -1,5 +1,6 @@
 # rpi-ubuntu-serviio
 Setup dedicated Serviio server on a Raspberry Pi with Ubuntu server using Ansible.
+
 RaspberryPi をServiio専用サーバとして構成するためのAnsibleコード。
 Raspberry-Pi-Imagerで焼き込んだUbuntu Server 21.04 (64bit) に対し、cloud-init調整のためのシェルスクリプトと起動後にネットワーク越しにServiioサーバを構築するためのAnsibleコードからなる。
 
@@ -12,7 +13,7 @@ Raspberry-Pi-Imagerで焼き込んだUbuntu Server 21.04 (64bit) に対し、clo
 - ネットワークは有線LAN/無線LANの両方に対応
 
 
-# 使い方(構築方法)
+# 使い方 (構築方法)
 
 ## Step1: microSD(またはUSBドライブ等)の作成と調整
 1. raspberry-pi-imager で Ubuntu Server 21.04 (64bit) を書き込む
@@ -26,8 +27,9 @@ Raspberry-Pi-Imagerで焼き込んだUbuntu Server 21.04 (64bit) に対し、clo
 4. SDカード(またはUSBドライブ等)をMacから取り外し、Raspberry Pi にセットして起動
 
 ## Step2: ネットワーク越しのサーバ構築
-6. 起動完了までしばらく待つ
-7. IPアドレスを調べる
+6. Raspberry Piの起動完了までしばらく待つ
+	- Wi-Fi設定時は自動的に一度再起動するので
+7. Raspberry PiのIPアドレスを調べる
 8. `hosts.yml` ファイルにIPアドレスを記載する
 9. macOSからRaspberry Piにssh接続するための設定
 	- 秘密鍵を登録： `ssh-add ~/.ssh/id_rsa`
@@ -36,10 +38,10 @@ Raspberry-Pi-Imagerで焼き込んだUbuntu Server 21.04 (64bit) に対し、clo
 		- デフォルトパスワードは `ubuntu`
 	- 自分のアカウントの公開鍵をコピーする：`ssh-copy-id ubuntu@(IPアドレス)`
 10. サーバ構築実行
-	- `ansible-playbook -I hosts.yml site.yml`
+	- `ansible-playbook -i hosts.yml site.yml`
 
 
 # Serviioへのアクセス
-avahiを導入し、Nginxでポート`:80`からServiioのデフォルトポート`:23423`およびトップ画面のパス`/console`へのproxyを構成しているので、次のURLでServiioトップ画面にアクセスできる
+avahiを導入し、Nginxでポート`:80`からServiioのデフォルトポート`:23423`へのproxyおよびトップ画面のパス`/console`へのリダイレクトを構成しているので、次のURLでServiioトップ画面にアクセスできる
 
 http://serviio.local/
